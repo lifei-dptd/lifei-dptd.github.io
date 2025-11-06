@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>简化版个税计算器</title>
+    <style>
+        /* 简单样式，美观易读 */
+        body {
+            font-family:  Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+        .container {
+            background: #f5fafe;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h2 {
+            text-align: center;
+            color: #2d3748;
+        }
+        .input-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #4a5568;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #4299e1;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background: #3182ce;
+        }
+        .result {
+            margin-top: 20px;
+            padding: 15px;
+            background: #e8f4f8;
+            border-radius: 5px;
+            display: none; /* 初始隐藏结果 */
+        }
+        .result h3 {
+            margin: 0 0 10px 0;
+            color: #2d3748;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>简化版个税计算器</h2>
+        
+        <!-- 输入区域 -->
+        <div class="input-group">
+            <label for="salary">月收入（元）</label>
+            <input type="number" id="salary" placeholder="请输入月薪（如10000）" min="0">
+        </div>
+        
+        <div class="input-group">
+            <label for="threshold">个税起征点（元）</label>
+            <input type="number" id="threshold" value="5000" min="0">
+        </div>
+        
+        <button onclick="calculateTax()">计算应缴个税</button>
+        
+        <!-- 结果显示区域 -->
+        <div class="result" id="result">
+            <h3>计算结果</h3>
+            <p>月收入：<span id="showSalary"></span> 元</p>
+            <p>起征点：<span id="showThreshold"></span> 元</p>
+            <p>应纳税所得额：<span id="taxableIncome"></span> 元</p>
+            <p><strong>应缴个税：<span id="taxAmount"></span> 元</strong></p>
+        </div>
+    </div>
+
+    <script>
+        // 简化税率规则（实际个税有专项附加扣除，这里简化为3级税率，易理解）
+        function calculateTax() {
+            // 获取输入值（转成数字）
+            const salary = Number(document.getElementById('salary').value);
+            const threshold = Number(document.getElementById('threshold').value);
+            
+            // 验证输入（非负数、不为空）
+            if (isNaN(salary) || salary < 0) {
+                alert('请输入有效的月收入！');
+                return;
+            }
+            if (isNaN(threshold) || threshold < 0) {
+                alert('请输入有效的起征点！');
+                return;
+            }
+            
+            // 计算应纳税所得额 = 月薪 - 起征点（不足0则无需缴税）
+            const taxableIncome = Math.max(0, salary - threshold);
+            let taxAmount = 0;
+            
+            // 简化分级税率（按应纳税所得额分级计税）
+            if (taxableIncome <= 3000) {
+                // 不超过3000元：3%税率
+                taxAmount = taxableIncome * 0.03;
+            } else if (taxableIncome <= 12000) {
+                // 3001-12000元：10%税率
+                taxAmount = taxableIncome * 0.1;
+            } else {
+                // 超过12000元：20%税率（简化处理，实际更高档位税率更高）
+                taxAmount = taxableIncome * 0.2;
+            }
+            
+            // 保留2位小数（金额格式）
+            taxAmount = taxAmount.toFixed(2);
+            
+            // 显示结果
+            document.getElementById('showSalary').textContent = salary;
+            document.getElementById('showThreshold').textContent = threshold;
+            document.getElementById('taxableIncome').textContent = taxableIncome;
+            document.getElementById('taxAmount').textContent = taxAmount;
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
